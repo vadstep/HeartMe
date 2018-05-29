@@ -6,15 +6,15 @@ import android.arch.lifecycle.ViewModel
 
 
 class BloodTestViewModel : ViewModel() {
-    var mCurrentName: MutableLiveData<String> =MutableLiveData()
+    var mCurrentName: MutableLiveData<Test> =MutableLiveData()
     var name: String=""
     var test: String=""
     lateinit var model: Config
     fun calc(){
         if(test.length>4){
-            mCurrentName.value="hui"
+            mCurrentName.value=model.bloodTestConfig.get(0)
         }else{
-            mCurrentName.value=""
+            mCurrentName.value=null
         }
     }
 

@@ -37,9 +37,15 @@ class BloodTestFragment : Fragment() {
         test.visibility = View.INVISIBLE
         viewModel = ViewModelProviders.of(this).get(BloodTestViewModel::class.java)
         getAPI()
-        viewModel.mCurrentName.observe(this, Observer<String> {
-            if (it.isNullOrEmpty()) {
+        viewModel.mCurrentName.observe(this, Observer<Test> {
+            if (it!=null) {
                 test.visibility = View.INVISIBLE
+                test.text=it.name
+                if(it.threshold>10){
+                    test.setCompoundDrawablesWithIntrinsicBounds(0,0,0,R.drawable.smile)
+                }else{
+                    test.setCompoundDrawablesWithIntrinsicBounds(0,0,0,R.drawable.sad)
+                }
             } else {
                 test.visibility = View.VISIBLE
             }
