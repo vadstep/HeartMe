@@ -14,9 +14,11 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.vadstep.heartme.R
+import com.example.vadstep.heartme.model.Config
+import com.example.vadstep.heartme.model.Result
+import com.example.vadstep.heartme.model.Test
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.blood_test_fragment.*
-
 
 
 class BloodTestFragment : Fragment() {
@@ -37,17 +39,13 @@ class BloodTestFragment : Fragment() {
         test.visibility = View.INVISIBLE
         viewModel = ViewModelProviders.of(this).get(BloodTestViewModel::class.java)
         getAPI()
-        viewModel.mCurrentName.observe(this, Observer<Test> {
-            if (it!=null) {
-                test.visibility = View.INVISIBLE
-                test.text=it.name
-                if(it.threshold>10){
-                    test.setCompoundDrawablesWithIntrinsicBounds(0,0,0,R.drawable.smile)
-                }else{
-                    test.setCompoundDrawablesWithIntrinsicBounds(0,0,0,R.drawable.sad)
-                }
-            } else {
+        viewModel.mCurrentName.observe(this, Observer<Result> {
+            if (it != null) {
                 test.visibility = View.VISIBLE
+                test.text = it.text
+                test.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, it.pic)
+            } else {
+                test.visibility = View.INVISIBLE
             }
         })
         name.addTextChangedListener(object : TextWatcher {
@@ -59,6 +57,7 @@ class BloodTestFragment : Fragment() {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 viewModel.name = p0.toString()
+                viewModel.calc()
             }
         })
         result.addTextChangedListener(object : TextWatcher {
@@ -81,10 +80,10 @@ class BloodTestFragment : Fragment() {
         val url = "https://s3.amazonaws.com/s3.helloheart.home.assignment/bloodTestConfig.json"
         val stringRequest = StringRequest(Request.Method.GET, url,
                 Response.Listener<String> { response ->
-                    viewModel.model=Gson().fromJson(response,Config::class.java)
+                    viewModel.model = Gson().fromJson(response, Config::class.java)
                 },
                 Response.ErrorListener {
-                    viewModel.model=Config(bloodTestConfig= listOf(Test(name="HDL Cholesterol", threshold=40), Test(name="LDL Cholesterol", threshold=100), Test(name="A1C", threshold=4)))
+                    viewModel.model = Config(bloodTestConfig = listOf(Test(name = "HDL Cholesterol", threshold = 40), Test(name = "LDL Cholesterol", threshold = 100), Test(name = "A1C", threshold = 4)))
                 })
 
         queue.add(stringRequest)
